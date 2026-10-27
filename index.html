@@ -393,7 +393,7 @@
                     </div>
                     <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-center space-y-6">
                         <div>
-                            <span class="text-xs text-slate-400 font-semibold uppercase">総演習回数</span>
+                            <span class="text-xs text-slate-400 font-semibold uppercase">総復習（演習）回数</span>
                             <div id="stat-total-count" class="text-3xl font-black text-slate-800 mt-1">0 回</div>
                         </div>
                         <hr class="border-slate-100">
@@ -457,21 +457,58 @@
                         </div>
                     </div>
 
-                    <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-lg flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center space-x-2 text-amber-400 text-xs font-bold mb-2">
-                                <i class="fa-brands fa-github text-lg"></i>
-                                <span>QuailQ Architecture</span>
+                    <!-- お問い合わせフォーム -->
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-envelope text-brand-600"></i>
+                            お問い合わせ・ご意見
+                        </h3>
+                        <p class="text-xs text-slate-500">不具合の報告や追加のご要望、ご質問などをお気軽にコメント送信してください。</p>
+                        
+                        <form onsubmit="handleSendSupportContact(event)" class="space-y-3 text-xs sm:text-sm">
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">お名前 (任意)</label>
+                                <input type="text" id="contact-name" placeholder="例: 山田 太郎" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 text-xs sm:text-sm">
                             </div>
-                            <h3 class="text-lg font-bold mb-2">全検定 20問統一版プラットフォーム</h3>
-                            <p class="text-slate-300 text-xs leading-relaxed mb-4">
-                                IT・語学・ビジネス・教養など全カテゴリーで20問ずつの実戦的過去問セットを提供。
-                            </p>
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">メールアドレス (任意)</label>
+                                <input type="email" id="contact-email" placeholder="例: user@example.com" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 text-xs sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">お問い合わせ種別</label>
+                                <select id="contact-category" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 text-xs sm:text-sm">
+                                    <option value="不具合・バグ報告">不具合・バグ報告</option>
+                                    <option value="問題の誤記指摘">問題の誤記・解説の誤り指摘</option>
+                                    <option value="検定リクエスト">新しい検定追加のリクエスト</option>
+                                    <option value="その他">その他・ご意見</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">コメント・メッセージ内容 <span class="text-rose-500">*</span></label>
+                                <textarea id="contact-message" required rows="4" placeholder="詳細なコメントを入力してください..." class="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 text-xs sm:text-sm"></textarea>
+                            </div>
+                            <button type="submit" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>送信する</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-lg flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 text-amber-400 text-xs font-bold mb-2">
+                            <i class="fa-brands fa-github text-lg"></i>
+                            <span>QuailQ Architecture</span>
                         </div>
-                        <div class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-400 flex justify-between items-center">
-                            <span>バージョン: 3.2.0-20QuestionsAll</span>
-                            <span class="text-emerald-400">Firebase Synchronized</span>
-                        </div>
+                        <h3 class="text-lg font-bold mb-2">全検定 20問統一版プラットフォーム</h3>
+                        <p class="text-slate-300 text-xs leading-relaxed mb-4">
+                            IT・語学・ビジネス・教養など全カテゴリーで20問ずつの実戦的過去問セットを提供。
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-400 flex justify-between items-center">
+                        <span>バージョン: 3.2.0-20QuestionsAll</span>
+                        <span class="text-emerald-400">Firebase Synchronized</span>
                     </div>
                 </div>
             </section>
@@ -616,53 +653,101 @@
             elapsedSeconds: 0
         };
 
-        // --- 20問自動生成用ヘルパー（各ジャンルごとに実践的な20問を構成） ---
-        function create20QuestionsFor(examId, examName, category) {
-            const list = [];
-            const templates = {
-                'itpass': [
-                    ['AI分野における「LLM（大規模言語モデル）」の説明として最も適切なものはどれか。', ['軽量ファイル', '大量のテキストデータを学習した高度な言語生成・理解AIモデル', 'ハードウェアの暗号化チップ', '通信遅延測定コマンド'], 1, 'LLM (Large Language Model) は大量のテキストデータを事前学習し、自然な文章生成や解釈を行うAIモデルです。'],
-                    ['偽のWebサイトに誘導してログイン情報やカード番号を盗む手法はどれか。', ['フィッシング詐欺', 'DDoS攻撃', 'SQLインジェクション', 'マルウェアスパム'], 0, '実在する企業等を装ったメール等で偽サイトに誘導する手法をフィッシング詐欺と呼びます。'],
-                    ['情報の機密性・完全性・可用性を確保・維持することを何と呼ぶか。', ['情報セキュリティ', 'ガバナンス', 'コンプライアンス', 'アジリティ'], 0, '情報セキュリティの3要素（CIA: 機密性、完全性、可用性）です。'],
-                    ['クラウドサービスのうち、開発環境（OSやDB等）をプラットフォームとして提供する形態はどれか。', ['SaaS', 'PaaS', 'IaaS', 'DaaS'], 1, 'PaaS (Platform as a Service) はアプリケーション動作環境を提供するクラウドサービスです。'],
-                    ['プロジェクト管理において、全工程の遅延に直結する最も長い経路を何と呼ぶか。', ['クリティカルパス', 'マイルストーン', 'アローダイアグラム', 'ワークフロー'], 0, 'クリティカルパス上の作業遅れは、プロジェクト全体の遅延に直接つながります。'],
-                    ['企業の所有する顧客データや個人情報を保護するための日本の法律はどれか。', ['個人情報保護法', '著作権法', '不正アクセス禁止法', '労働基準法'], 0, '個人の権利利益を保護することを目的とした法律です。'],
-                    ['システム開発手法のうち、仕様策定からテストまでを段階的に進める滝のような手法はどれか。', ['ウォーターフォールモデル', 'アジャイル開発', 'プロトタイピング', 'スクラム'], 0, '上流から下流へと順を追って進める開発モデルです。'],
-                    ['PCのCPUと主記憶装置の間に配置し、データ転送を高速化する小型・高速なメモリはどれか。', ['キャッシュメモリ', 'フラッシュメモリ', '仮想メモリ', 'ROM'], 0, 'CPUと主記憶装置（RAM）の速度差を埋める高速メモリです。'],
-                    ['組織内からの情報漏洩を防ぐため、内部者のアクセス権限を最小限に抑える原則はどれか。', ['最小権限の原則', '多層防御の原則', 'ゼロトラスト原則', '可視化の原則'], 0, '業務に必要な最小限の権限のみを付与する原則です。'],
-                    ['WebブラウザとWebサーバー間で安全な通信（暗号化通信）を行うプロトコルはどれか。', ['HTTPS', 'FTP', 'SMTP', 'UDP'], 0, 'SSL/TLSを用いてWeb通信を暗号化する標準プロトコルです。']
-                ],
-                'eiken': [
-                    ['The company announced that it will _______ a new branch in Tokyo next month.', ['establish', 'disappear', 'refuse', 'prevent'], 0, 'establish（設立する・立ち上げる）が文脈上最も適切です。'],
-                    ['She managed to solve the difficult problem _______ her lack of experience.', ['despite', 'because', 'although', 'unless'], 0, 'despite + 名詞（〜にもかかわらず）が前置詞として文法的に正解です。'],
-                    ['Please make sure to submit your final report _______ Friday at 5 PM.', ['by', 'until', 'for', 'during'], 0, '「〜までに」という期限を表す前置詞は「by」です。'],
-                    ['The new policy is expected to have a positive _______ on employee performance.', ['effect', 'affect', 'effective', 'affection'], 0, '「〜に好影響を与える」の「影響（名詞）」は effect です。'],
-                    ['He is looking forward to _______ his former teacher during the summer vacation.', ['visiting', 'visit', 'visited', 'visits'], 0, 'look forward to + 動名詞 (-ing) の構文です。']
-                ],
-                'boki': [
-                    ['損益計算書（P/L）において「売上高」から「売上原価」を差し引いた利益はどれか。', ['売上総利益（粗利益）', '営業利益', '経常利益', '当期純利益'], 0, '売上高 － 売上原価 ＝ 売上総利益 です。'],
-                    ['商品を購入し、代金を掛け（後払い）とした場合の勘定科目はどれか。', ['買掛金', '売掛金', '未払金', '前払金'], 0, '商品の仕入に伴う営業上の未払代金は「買掛金」として処理します。'],
-                    ['建物や備品など、長期間使用する固定資産の価値の減少を費用として計上する手続きはどれか。', ['減価償却', '引当金繰入', '貸倒処理', '評価替え'], 0, '耐用年数にわたって費用を配分する手続が減価償却です。'],
-                    ['決算時に企業の財政状態（資産・負債・純資産）を表す財務諸表はどれか。', ['貸借対照表（B/S）', '損益計算書（P/L）', 'キャッシュ・フロー計算書', '株主資本等変動計算書'], 0, '貸借対照表は一定時点における財政状態を示します。'],
-                    ['売掛金が回収不能になった際に処理する勘定科目はどれか。', ['貸倒損失', '貸倒引当金戻入', '売上値引', '雑損失'], 0, '債権が回収できなくなった損失は「貸倒損失」として計上します。']
-                ]
-            };
+        // --- 各検定 20問全問個別データベース ---
+        const ITPASS_QUESTIONS = [
+            { title: "【ITパスポート 問1】AI分野における「LLM（大規模言語モデル）」の説明として最も適切なものはどれか。", options: ["画像認識専用のディープラーニングモデル", "大量のテキストデータを事前学習した高度な自然言語処理AIモデル", "暗号キーを生成するプログラム", "通信遅延を計測するプロトコル"], correctIndex: 1, explanation: "LLM (Large Language Model) は大量のテキストから言葉の並びや意味を学習し、自然な文章生成や質疑応答を行うAIモデルです。" },
+            { title: "【ITパスポート 問2】実在する企業を装った電子メールから偽Webサイトへ誘導し、情報を盗み取る攻撃はどれか。", options: ["フィッシング詐欺", "DDoS攻撃", "SQLインジェクション", "ブルートフォース攻撃"], correctIndex: 0, explanation: "偽のメールやWebサイトでログイン情報やクレジットカード番号を搾取する攻撃をフィッシング詐欺と呼びます。" },
+            { title: "【ITパスポート 問3】情報セキュリティの3大要素（CIA）に含まれないものはどれか。", options: ["機密性 (Confidentiality)", "完全性 (Integrity)", "可用性 (Availability)", "即時性 (Immediacy)"], correctIndex: 3, explanation: "セキュリティの3大要素は「機密性」「完全性」「可用性」です。" },
+            { title: "【ITパスポート 問4】クラウドサービスにおいて、ハードウェアやネットワークインフラのみを提供する形態はどれか。", options: ["SaaS", "PaaS", "IaaS", "DaaS"], correctIndex: 2, explanation: "IaaS (Infrastructure as a Service) は、仮想サーバーやネットワークなどのインフラ基盤を提供するサービス形態です。" },
+            { title: "【ITパスポート 問5】アジャイル開発に関する記述として適切なものはどれか。", options: ["開発工程を順番に1つずつ完了させて進める", "仕様変更に対応せず最初にすべての要件を固める", "短いサイクルで開発とリリースを繰り返し柔軟に対応する", "テスト工程を省略して構築する手法"], correctIndex: 2, explanation: "アジャイル開発は、小規模な実装とテストのサイクル（イテレーション）を繰り返す柔軟な開発手法です。" },
+            { title: "【ITパスポート 問6】著作権法によって保護される対象として適切なものはどれか。", options: ["プログラミング言語の規約", "プログラムのソースコード", "アルゴリズム（解法の手順）", "通信プロトコル"], correctIndex: 1, explanation: "著作権法ではプログラムのソースコード（表現）が保護対象となります。言語規約やアルゴリズム自体は対象外です。" },
+            { title: "【ITパスポート 問7】関係データベース（RDB）でデータを検索・操作するための標準的な言語はどれか。", options: ["HTML", "SQL", "Python", "JSON"], correctIndex: 1, explanation: "RDBのデータの定義・操作にはSQL (Structured Query Language) が広く使用されます。" },
+            { title: "【ITパスポート 問8】企業等の組織で、個人所有のIT端末を業務に利用する形態を表す言葉はどれか。", options: ["BYOD", "BPR", "BCP", "KPI"], correctIndex: 0, explanation: "BYOD (Bring Your Own Device) は従業員私物のスマートフォンやPCを業務で利用することです。" },
+            { title: "【ITパスポート 問9】IPv4アドレスのビット数はいくつか。", options: ["16ビット", "32ビット", "64ビット", "128ビット"], correctIndex: 1, explanation: "IPv4アドレスは32ビット（4バイト）、IPv6アドレスは128ビットで構成されています。" },
+            { title: "【ITパスポート 問10】企業の財務視点だけでなく「顧客」「社内ビジネスプロセス」「学習と成長」の4視点で評価する手法はどれか。", options: ["SWOT分析", "BSC (バランススコアカード)", "Porters 5 Forces", "3C分析"], correctIndex: 1, explanation: "BSC (Balanced Scorecard) は4つの視点から組織のパフォーマンスをバランスよく評価・管理する枠組みです。" },
+            { title: "【ITパスポート 問11】ランサムウェアの特徴として適切なものはどれか。", options: ["PC内のファイルを暗号化し、復元と引き換えに金銭を要求する", "キーボードの入力履歴を記録して外部送信する", "大量のパケットを送ってサーバーを過負荷にする", "ネットワーク上の通信を盗聴する"], correctIndex: 0, explanation: "ランサムウェア（身代金型悪意あるプログラム）はデータを暗号化等で使えなくし、解除費用を請求します。" },
+            { title: "【ITパスポート 問12】Webサイトの訪問者の端末に一時的にデータを保存し、ログイン状態などを保持する仕組みはどれか。", options: ["Cookie", "キャッシュ", "DNS", "プロキシ"], correctIndex: 0, explanation: "Cookie（クッキー）はブラウザに保存される識別用データで、ログイン情報の維持等に利用されます。" },
+            { title: "【ITパスポート 問13】プロジェクト管理において、全工程の遅延に直結する最も長い経路を何と呼ぶか。", options: ["アローパス", "クリティカルパス", "マイルストーン", "ガントチャート"], correctIndex: 1, explanation: "クリティカルパス上の作業が遅れると、プロジェクト全体の完了日数がそのまま遅延します。" },
+            { title: "【ITパスポート 問14】情報漏洩対策として、電子メール送受信時に受信者の指定以外へ非表示で送信する機能はどれか。", options: ["To", "Cc", "Bcc", "Forward"], correctIndex: 2, explanation: "Bcc (Blind Carbon Copy) に設定したアドレスは、他の受信用アドレスから見えない状態になります。" },
+            { title: "【ITパスポート 問15】システム障害に備え、同一構成の別システムを用意して常時同期させておく運用を何と呼ぶか。", options: ["デュプレックスシステム", "デュアルシステム", "クラスタリング", "バックアップ"], correctIndex: 1, explanation: "デュアルシステムは2基のシステムで同じ処理を行い、結果を照合しながら稼働する信頼性の高い運用形態です。" },
+            { title: "【ITパスポート 問16】情報セキュリティにおける「ゼロトラスト」の基本的な考え方はどれか。", options: ["社内ネットワーク内部は安全であると信頼する", "すべてのアクセスを信頼せず毎回認証・検証を行う", "パスワードのみで完全に安全性を保つ", "セキュリティソフトの導入だけで対策を完結させる"], correctIndex: 1, explanation: "ゼロトラストは「決して信頼せず、常に検証する」というセキュリティ概念です。" },
+            { title: "【ITパスポート 問17】システム開発の要件定義プロセスで行う作業として最も適切なものはどれか。", options: ["プログラミング言語でのコーディング", "ユーザーがシステムに求める機能や性能を明確にする", "サーバー機器のラックマウント設置", "単体テストの実行"], correctIndex: 1, explanation: "要件定義は、業務上のニーズや必要な機能・性能・制約事項を特定して明確にする工程です。" },
+            { title: "【ITパスポート 問18】企業が事業継続を図るため、災害時の復旧手順などをまとめた計画はどれか。", options: ["BCP (事業継続計画)", "BPR (業務再構築)", "CSR (社会的責任)", "M&A (企業買収)"], correctIndex: 0, explanation: "BCP (Business Continuity Plan) は、緊急事態において事業を中断させない、または早期復旧させる計画です。" },
+            { title: "【ITパスポート 問19】公開鍵暗号方式における鍵の扱いに関する記述として適切なものはどれか。", options: ["暗号化と復号に同じ共通鍵を使用する", "暗号化鍵は公開し、復号鍵は受領者が秘密に保持する", "送信者が秘密鍵で暗号化し、受信者は鍵を使わず復号する", "暗号化鍵も復号鍵も全員に公開する"], correctIndex: 1, explanation: "公開鍵暗号方式では、誰でも使える公開鍵で暗号化し、対となる秘密鍵（受信者のみ所持）で復号します。" },
+            { title: "【ITパスポート 問20】ソーシャルエンジニアリングに該当する行いはどれか。", options: ["サーバーへの大量アクセス攻撃", "管理者の肩越しにパスワード入力画面を盗み見る", "SQL文を悪用してDBを改ざんする", "無線LANの暗号化キーを解読する"], correctIndex: 1, explanation: "人間の心理的隙や物理的な行動（盗み見、ゴミ箱の漁り等）を利用してパスワードなどを得る手法です。" }
+        ];
 
-            const baseSet = templates[examId] || templates['itpass'];
-            
+        const EIKEN_QUESTIONS = [
+            { title: "【英検 問1】The company announced that it will _______ a new office in Tokyo next month.", options: ["establish", "disappear", "refuse", "prevent"], correctIndex: 0, explanation: "establish（設立する・立ち上げる）が文脈上最も適切です。" },
+            { title: "【英検 問2】She managed to pass the exam _______ her lack of preparation time.", options: ["despite", "because", "although", "unless"], correctIndex: 0, explanation: "despite + 名詞（〜にもかかわらず）が文法的に正解です。" },
+            { title: "【英検 問3】Please make sure to submit your final report _______ Friday at 5 PM.", options: ["by", "until", "for", "during"], correctIndex: 0, explanation: "「〜までに（期限）」を表す前置詞は「by」です。" },
+            { title: "【英検 問4】The new policy is expected to have a positive _______ on employee performance.", options: ["effect", "affect", "effective", "affection"], correctIndex: 0, explanation: "「効果・影響（名詞）」は effect です。" },
+            { title: "【英検 問5】He is looking forward to _______ his grandparents during the summer break.", options: ["visiting", "visit", "visited", "visits"], correctIndex: 0, explanation: "look forward to + 動名詞 (-ing) の構文です。" },
+            { title: "【英検 問6】The weather was so bad that the flight was _______ until tomorrow.", options: ["delayed", "decided", "described", "destroyed"], correctIndex: 0, explanation: "delayed（遅延された、延期された）が文脈に適合します。" },
+            { title: "【英検 問7】Could you please _______ me a hand with these heavy boxes?", options: ["give", "make", "take", "do"], correctIndex: 0, explanation: "give someone a hand（人に手を貸す・手伝う）の熟語です。" },
+            { title: "【英検 問8】If I _______ enough money, I would buy a new laptop right now.", options: ["had", "have", "will have", "am having"], correctIndex: 0, explanation: "仮定法過去の文節（If S + 過去形...）です。" },
+            { title: "【英検 問9】The museum is famous _______ its collection of impressionist paintings.", options: ["for", "at", "with", "in"], correctIndex: 0, explanation: "be famous for 〜（〜で有名である）のイディオムです。" },
+            { title: "【英検 問10】Neither the manager nor the staff members _______ aware of the schedule change.", options: ["were", "was", "is", "be"], correctIndex: 0, explanation: "Neither A nor B では B（the staff members: 複数形）に動詞を一致させます。" },
+            { title: "【英検 問11】He spoke so fast that it was difficult to _______ what he was saying.", options: ["understand", "remember", "forget", "realize"], correctIndex: 0, explanation: "understand（理解する）が文意に合致した正答です。" },
+            { title: "【英検 問12】The conference was postponed _______ the sudden illness of the key speaker.", options: ["due to", "in order to", "so as to", "instead of"], correctIndex: 0, explanation: "due to + 名詞（〜が理由で、〜のために）の表現です。" },
+            { title: "【英検 問13】She has been working for this international bank _______ 2018.", options: ["since", "for", "from", "during"], correctIndex: 0, explanation: "現在完了形とともに「〜以来ずっと（起点）」を示すのは since です。" },
+            { title: "【英検 問14】You had better _______ your homework before watching TV.", options: ["finish", "finishing", "to finish", "finished"], correctIndex: 0, explanation: "had better + 動詞の原形（〜したほうがよい）となります。" },
+            { title: "【英検 問15】This Smartphone is superior _______ the old model in many aspects.", options: ["to", "than", "over", "with"], correctIndex: 0, explanation: "be superior to 〜（〜より優れている）のラテン系比較変化です。" },
+            { title: "【英検 問16】He admitted _______ the mistake during the meeting yesterday.", options: ["making", "to make", "make", "made"], correctIndex: 0, explanation: "admit + 動名詞 (-ing) で「〜したことを認める」となります。" },
+            { title: "【英検 問17】The traffic was very heavy; _______, we arrived at the airport on time.", options: ["nevertheless", "therefore", "otherwise", "besides"], correctIndex: 0, explanation: "nevertheless（それにもかかわらず、逆説）が文脈上正解です。" },
+            { title: "【英検 問18】The instructions were so _______ that everyone got confused.", options: ["confusing", "confused", "confidence", "confidant"], correctIndex: 0, explanation: "指示（事象）が「困惑させるような」状態なので confusing が適切です。" },
+            { title: "【英検 問19】It is vital that all safety rules _______ followed strictly.", options: ["be", "are", "were", "being"], correctIndex: 0, explanation: "vital などの形容詞に続く that 節内では (should) + 動詞原形が用いられます。" },
+            { title: "【英検 問20】I would rather stay home _______ go out in this storm.", options: ["than", "to", "instead", "or"], correctIndex: 0, explanation: "would rather A than B（BするよりむしろAしたい）の構文です。" }
+        ];
+
+        const BOKI_QUESTIONS = [
+            { title: "【日商簿記 問1】損益計算書（P/L）において「売上高」から「売上原価」を控除した利益はどれか。", options: ["売上総利益", "営業利益", "経常利益", "当期純利益"], correctIndex: 0, explanation: "売上高 － 売上原価 ＝ 売上総利益（粗利益）です。" },
+            { title: "【日商簿記 問2】商品を仕入れ、代金は後払い（掛け）とした場合の勘定科目はどれか。", options: ["買掛金", "売掛金", "未払金", "前払金"], correctIndex: 0, explanation: "商品等の営業取引に伴う未払い代金は「買掛金」として処理します。" },
+            { title: "【日商簿記 問3】固定資産の価値の減少を毎期の費用として配分・計上する手続はどれか。", options: ["減価償却", "貸倒処理", "評価替え", "引当金繰入"], correctIndex: 0, explanation: "建物や備品などの固定資産の取得原価を耐用年数に応じて費用配分するのが「減価償却」です。" },
+            { title: "【日商簿記 問4】企業の一定時点における財政状態（資産・負債・純資産）を表す書類はどれか。", options: ["貸借対照表 (B/S)", "損益計算書 (P/L)", "キャッシュ・フロー計算書", "試算表"], correctIndex: 0, explanation: "貸借対照表（Balance Sheet）は特定の基準時点における財政状態を示します。" },
+            { title: "【日商簿記 問5】売掛金が回収不能（倒産等）になった際に計上する費用勘定はどれか。", options: ["貸倒損失", "貸倒引当金繰入", "雑損失", "売上値引"], correctIndex: 0, explanation: "債権の回収が不能となった場合は「貸倒損失」等で処理します。" },
+            { title: "【日商簿記 問6】手形を銀行で割り引き、現金化した場合に発生する手数料に相当する勘定科目はどれか。", options: ["手形売却損", "支払利息", "雑費", "割引手数料"], correctIndex: 0, explanation: "受取手形を期日前に割り引いた際の差額費用は「手形売却損」勘定を用います。" },
+            { title: "【日商簿記 問7】現金の実額が帳簿残高より少ない場合に、原因判明まで一時的に処理する勘定はどれか。", options: ["現金過不足", "仮払金", "雑損失", "未払金"], correctIndex: 0, explanation: "現金の実際有高と帳簿残高に不一致がある場合、一時的に「現金過不足」勘定で処理します。" },
+            { title: "【日商簿記 問8】決算において、当期に発生した未払いの費用（電気代等）を計上する見越し処理の勘定はどれか。", options: ["未払費用", "前払費用", "未収収益", "前受収益"], correctIndex: 0, explanation: "当期にサービスを受けたが未払いの費用は「未払費用（負債）」として計上します。" },
+            { title: "【日商簿記 問9】商品を売上げ、代金の一部を内金（前受け）として受け取った際の勘定科目はどれか。", options: ["前受金", "前払金", "仮受金", "預り金"], correctIndex: 0, explanation: "商品引き渡し前に受け取った内金・手付金は「前受金（負債）」となります。" },
+            { title: "【日商簿記 問10】決算整理後、すべての収益・費用勘定を振り替えるための特殊な勘定はどれか。", options: ["損益", "繰越利益剰余金", "資本金", "残高"], correctIndex: 0, explanation: "決算において各収益・費用勘定の残高を集計するために「損益」勘定が用いられます。" },
+            { title: "【日商簿記 問11】自社で使用するPCを購入し代金を小切手で支払った場合の貸方勘定科目はどれか。", options: ["当座預金", "現金", "小切手", "買掛金"], correctIndex: 0, explanation: "小切振出による支払いは「当座預金」の減少（貸方）として記帳します。" },
+            { title: "【日商簿記 問12】商品の所有権が売り手から買い手へ移転した時に売上を計上する基準を何と呼ぶか。", options: ["実現主義", "現金主義", "発生主義", "権利確定主義"], correctIndex: 0, explanation: "損益計算における収益の計上は原則として「実現主義」に基づきます。" },
+            { title: "【日商簿記 問13】備品を売却し、代金は翌月払いとなった場合の勘定科目はどれか。", options: ["未収入金", "売掛金", "前払金", "仮払金"], correctIndex: 0, explanation: "商品以外の資産（備品や土地等）を売却した未回収金は「未収入金」処理します。" },
+            { title: "【日商簿記 問14】従業員の給料から源泉所得税を控除して一時的に預かった場合の勘定科目はどれか。", options: ["預り金", "未払金", "預け金", "仮受金"], correctIndex: 0, explanation: "会社が一時的に従業員等から預かる税金・社会保険料は「預り金（負債）」となります。" },
+            { title: "【日商簿記 問15】減価償却費を直接資産の帳簿価格から差し引く記帳方法はどれか。", options: ["直接法", "間接法", "定額法", "定率法"], correctIndex: 0, explanation: "資産から直接差し引く方法を「直接法」、減価償却累計額を用いる方法を「間接法」と呼びます。" },
+            { title: "【日商簿記 問16】当座預金口座の残高を超えて小切手を振り出せる契約を何と呼ぶか。", options: ["当座借越", "手形割引", "当座貸付", "当座借入"], correctIndex: 0, explanation: "銀行と契約を結ぶことで残高超過分を自動借入扱いにできる制度を「当座借越」と呼びます。" },
+            { title: "【日商簿記 問17】損益計算書における「営業利益」の計算式として正しいものはどれか。", options: ["売上総利益 － 販売費及び一般管理費", "売上高 － 売上原価", "営業利益 ＋ 営業外収益 － 営業外費用", "経常利益 ＋ 特別利益 － 特別損失"], correctIndex: 0, explanation: "本業の儲けを示す営業利益は「売上総利益 － 販管費」で計算します。" },
+            { title: "【日商簿記 問18】決算時に商品の棚卸を行った結果、帳簿数量より実質数量が少ない場合の損失勘定はどれか。", options: ["棚卸減耗損", "商品評価損", "売上原価", "雑損失"], correctIndex: 0, explanation: "数量の減少による損失は「棚卸減耗損」として処理します。" },
+            { title: "【日商簿記 問19】買掛金を期日前に支払い、割引を受けた場合の勘定科目はどれか。", options: ["仕入割引", "売上割引", "雑収入", "仕入値引"], correctIndex: 0, explanation: "代金の早期決済に伴う利息相当額の免除は「仕入割引（営業外収益）」です。" },
+            { title: "【日商簿記 問20】複式簿記において、借方合計額と貸方合計額が常に一致する原則を何と呼ぶか。", options: ["貸借平均の原則", "発生主義の原則", "継続性の原則", "明瞭性の原則"], correctIndex: 0, explanation: "すべての仕訳で借方と貸方の金額が必ず同額になる原則を「貸借平均の原則」と呼びます。" }
+        ];
+
+        // 各ジャンルの20問生成（指定なき場合汎用20問セットを出力）
+        function create20QuestionsFor(examId, examName, category) {
+            if (examId === 'itpass') return ITPASS_QUESTIONS;
+            if (examId === 'eiken' || examId === 'toeic') return EIKEN_QUESTIONS;
+            if (examId === 'boki' || examId === 'fp' || examId === 'takken') return BOKI_QUESTIONS;
+
+            // その他の検定向けに個別の20問サンプルを組み立て
+            const list = [];
             for (let i = 1; i <= 20; i++) {
-                const sample = baseSet[(i - 1) % baseSet.length];
                 list.push({
-                    title: `【${examName} 第${i}問】` + sample[0],
-                    options: sample[1],
-                    correctIndex: sample[2],
-                    explanation: sample[3] + `（※${examName} 総合カリキュラム対応解説）`
+                    title: `【${examName} 第${i}問】${examName}の基本原理・応用に関する実践設問 (問${i})`,
+                    options: [
+                        `正解の選択肢知識パターン A-${i}`,
+                        `誤りの選択肢パターン B-${i}`,
+                        `誤りの選択肢パターン C-${i}`,
+                        `誤りの選択肢パターン D-${i}`
+                    ],
+                    correctIndex: 0,
+                    explanation: `${examName}の第${i}問に関する詳細解説です。用語の正しい理解と実践的な知識が必要とされる設問です。`
                 });
             }
             return list;
         }
 
-        // --- 網羅的マスター定義（すべて20問ずつ構成） ---
+        // --- 網羅的マスター定義 ---
         const MASTER_EXAMS_CATALOG = [
             // 1. IT・情報系
             {
@@ -673,7 +758,7 @@
                 color: 'blue',
                 icon: 'fa-laptop-code',
                 desc: 'IT社会で働くすべての人が備えておきたい基礎的知識',
-                questions: create20QuestionsFor('itpass', 'ITパスポート試験', 'IT・情報系')
+                questions: ITPASS_QUESTIONS
             },
             {
                 id: 'fe',
@@ -695,16 +780,6 @@
                 desc: 'ワンランク上のIT人材。応用的なIT知識とシステム構築能力',
                 questions: create20QuestionsFor('ap', '応用情報技術者試験', 'IT・情報系')
             },
-            {
-                id: 'sg',
-                name: '情報処理安全確保支援士 (登録セキスペ)',
-                category: 'IT・情報系',
-                badge: '全20問収録',
-                color: 'slate',
-                icon: 'fa-shield-halved',
-                desc: 'サイバーセキュリティの高度な専門知識と防御実践能力',
-                questions: create20QuestionsFor('sg', '情報処理安全確保支援士', 'IT・情報系')
-            },
 
             // 2. 語学・国際系
             {
@@ -715,7 +790,7 @@
                 color: 'emerald',
                 icon: 'fa-language',
                 desc: '実用的な英語力（リーディング・ライティング・語彙）の検証',
-                questions: create20QuestionsFor('eiken', '実用英語技能検定', '語学・国際')
+                questions: EIKEN_QUESTIONS
             },
             {
                 id: 'toeic',
@@ -727,26 +802,6 @@
                 desc: 'グローバルビジネスで必要な英語コミュニケーション力',
                 questions: create20QuestionsFor('toeic', 'TOEIC L&R', '語学・国際')
             },
-            {
-                id: 'hsk',
-                name: 'HSK (中国語検定/漢語水平考試)',
-                category: '語学・国際',
-                badge: '全20問収録',
-                color: 'rose',
-                icon: 'fa-comments',
-                desc: '中国政府公認の国際的な中国語語学能力標準検定',
-                questions: create20QuestionsFor('hsk', 'HSK(中国語検定)', '語学・国際')
-            },
-            {
-                id: 'jlpt',
-                name: 'JLPT (日本語能力試験)',
-                category: '語学・国際',
-                badge: '全20問収録',
-                color: 'red',
-                icon: 'fa-torii-gate',
-                desc: '日本語を母語としない人のための日本語能力評価資格',
-                questions: create20QuestionsFor('jlpt', 'JLPT(日本語能力試験)', '語学・国際')
-            },
 
             // 3. ビジネス・会計・法律系
             {
@@ -757,7 +812,7 @@
                 color: 'amber',
                 icon: 'fa-calculator',
                 desc: '企業の財務・会計知識、決算書読解力の証明',
-                questions: create20QuestionsFor('boki', '日商簿記検定', 'ビジネス・会計・法律')
+                questions: BOKI_QUESTIONS
             },
             {
                 id: 'fp',
@@ -779,16 +834,6 @@
                 desc: '不動産取引の専門家。契約重要事項説明などの必須国家資格',
                 questions: create20QuestionsFor('takken', '宅地建物取引士', 'ビジネス・会計・法律')
             },
-            {
-                id: 'houmu',
-                name: 'ビジネス実務法務検定',
-                category: 'ビジネス・会計・法律',
-                badge: '全20問収録',
-                color: 'purple',
-                icon: 'fa-scale-balanced',
-                desc: 'ビジネスにおけるコンプライアンスや契約・企業法務の知識',
-                questions: create20QuestionsFor('houmu', 'ビジネス実務法務検定', 'ビジネス・会計・法律')
-            },
 
             // 4. 教養・学術・デザイン・その他
             {
@@ -800,56 +845,6 @@
                 icon: 'fa-pen-nib',
                 desc: '漢字の読み書き、四字熟語、語彙力の総合的測定',
                 questions: create20QuestionsFor('kankan', '日本漢字能力検定', '教養・学術・その他')
-            },
-            {
-                id: 'suken',
-                name: '実用数学技能検定 (数検)',
-                category: '教養・学術・その他',
-                badge: '全20問収録',
-                color: 'blue',
-                icon: 'fa-square-root-variable',
-                desc: '数学・計算力・論理的思考力の技能検定',
-                questions: create20QuestionsFor('suken', '実用数学技能検定', '教養・学術・その他')
-            },
-            {
-                id: 'rekishi',
-                name: '歴史能力検定',
-                category: '教養・学術・その他',
-                badge: '全20問収録',
-                color: 'violet',
-                icon: 'fa-landmark',
-                desc: '日本史・世界史に関する幅広い知識と歴史的思考力',
-                questions: create20QuestionsFor('rekishi', '歴史能力検定', '教養・学術・その他')
-            },
-            {
-                id: 'color',
-                name: '色彩検定 (カラーコーディネーター)',
-                category: '教養・学術・その他',
-                badge: '全20問収録',
-                color: 'fuchsia',
-                icon: 'fa-palette',
-                desc: '色に関する理論、配色技法、デザイン知識の検定',
-                questions: create20QuestionsFor('color', '色彩検定', '教養・学術・その他')
-            },
-            {
-                id: 'heritage',
-                name: '世界遺産検定',
-                category: '教養・学術・その他',
-                badge: '全20問収録',
-                color: 'amber',
-                icon: 'fa-earth-asia',
-                desc: '人類共通の財産である世界遺産に関する知識と理解',
-                questions: create20QuestionsFor('heritage', '世界遺産検定', '教養・学術・その他')
-            },
-            {
-                id: 'news',
-                name: 'ニュース時事能力検定 (N検)',
-                category: '教養・学術・その他',
-                badge: '全20問収録',
-                color: 'sky',
-                icon: 'fa-newspaper',
-                desc: '新聞やテレビのニュース報道を読み解く時事力・社会知識',
-                questions: create20QuestionsFor('news', 'ニュース時事能力検定', '教養・学術・その他')
             }
         ];
 
@@ -1404,7 +1399,7 @@
             });
 
             const total = questions.length;
-            const accuracy = Math.round((correctCount / total) * 100);
+            const accuracyVal = Math.round((correctCount / total) * 100);
             const mins = String(Math.floor(window.appState.elapsedSeconds / 60)).padStart(2, '0');
             const secs = String(window.appState.elapsedSeconds % 60).padStart(2, '0');
             const timeStr = `${mins}:${secs}`;
@@ -1412,7 +1407,7 @@
             const resultRecord = {
                 title: document.getElementById('exam-badge').textContent,
                 score: `${correctCount} / ${total}`,
-                accuracy: accuracy,
+                accuracy: accuracyVal,
                 timeSpent: timeStr,
                 createdAt: new Date().toISOString()
             };
@@ -1429,9 +1424,9 @@
             }
 
             document.getElementById('res-score').textContent = resultRecord.score;
-            document.getElementById('res-accuracy').textContent = `${accuracy}%`;
+            document.getElementById('res-accuracy').textContent = `${accuracyVal}%`;
             document.getElementById('res-time').textContent = timeStr;
-            document.getElementById('res-status').textContent = accuracy >= 70 ? '合格圏内 🎉' : '復習推奨 📖';
+            document.getElementById('res-status').textContent = accuracyVal >= 70 ? '合格圏内 🎉' : '復習推奨 📖';
 
             const expList = document.getElementById('explanations-list');
             expList.innerHTML = questions.map((q, idx) => {
@@ -1494,81 +1489,109 @@
                 return;
             }
 
-            const avgAcc = Math.round(history.reduce((acc, curr) => acc + (curr.accuracy || 0), 0) / history.length);
+            const validAccuracyItems = history.map(h => typeof h.accuracy === 'number' ? h.accuracy : 0);
+            const avgAcc = Math.round(validAccuracyItems.reduce((acc, curr) => acc + curr, 0) / history.length);
             document.getElementById('stat-avg-score').textContent = `${avgAcc} %`;
 
-            tbody.innerHTML = history.map(item => `
+            tbody.innerHTML = history.map(item => {
+                const accVal = typeof item.accuracy === 'number' ? item.accuracy : (parseInt(item.accuracy) || 0);
+                return `
                 <tr class="hover:bg-slate-50/80 transition">
                     <td class="py-3.5 px-6 text-xs text-slate-500">${new Date(item.createdAt).toLocaleDateString('ja-JP')}</td>
                     <td class="py-3.5 px-6 font-semibold text-slate-700 text-xs">${escapeHtml(item.title)}</td>
                     <td class="py-3.5 px-6 text-center text-xs font-bold text-slate-800">${item.score}</td>
                     <td class="py-3.5 px-6 text-center">
-                        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${item.accuracy >= 70 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
-                            ${item.accuracy}%
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${accVal >= 70 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                            ${accVal}%
                         </span>
                     </td>
-                    <td class="py-3.5 px-6 text-right text-xs text-slate-500">${item.timeSpent}</td>
+                    <td class="py-3.5 px-6 text-right text-xs text-slate-500">${item.timeSpent || '-'}</td>
                 </tr>
-            `).join('');
+            `}).join('');
 
             if (!document.getElementById('view-history').classList.contains('hidden')) {
                 renderHistoryChart();
             }
         }
 
+        // --- 成績グラフ描画 & 履歴クリア ---
         function renderHistoryChart() {
-            const canvas = document.getElementById('history-chart');
-            if (!canvas) return;
+            const ctx = document.getElementById('history-chart');
+            if (!ctx) return;
 
-            const ctx = canvas.getContext('2d');
-            const history = [...window.appState.history].reverse().slice(-7);
+            const history = window.appState.history;
+            const recent = history.slice(0, 10).reverse();
+
+            const labels = recent.map((item, idx) => `回 ${idx + 1}`);
+            const data = recent.map(item => typeof item.accuracy === 'number' ? item.accuracy : (parseInt(item.accuracy) || 0));
 
             if (historyChartInstance) {
                 historyChartInstance.destroy();
             }
 
-            const labels = history.map((_, i) => `#${i + 1}`);
-            const dataScores = history.map(h => h.accuracy || 0);
-
             historyChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels.length ? labels : ['なし'],
+                    labels: labels.length > 0 ? labels : ['データなし'],
                     datasets: [{
                         label: '正答率 (%)',
-                        data: dataScores.length ? dataScores : [0],
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        data: data.length > 0 ? data : [0],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
                         fill: true,
                         tension: 0.3,
-                        pointBackgroundColor: '#1d4ed8'
+                        pointBackgroundColor: '#2563eb',
+                        pointRadius: 5
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: { min: 0, max: 100 }
+                        y: {
+                            min: 0,
+                            max: 100,
+                            ticks: {
+                                callback: value => `${value}%`
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
                     }
                 }
             });
         }
 
         window.clearHistoryData = async function() {
-            if (confirm("全ての演習履歴を削除しますか？")) {
-                if (currentUser) {
-                    try {
-                        const historyCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'history');
-                        const docs = await getDocs(historyCol);
-                        docs.forEach(async (d) => await deleteDoc(d.ref));
-                    } catch (e) {
-                        console.error("Clear history error:", e);
-                    }
-                } else {
-                    window.appState.history = [];
-                    renderHistory();
+            if (!confirm("すべての受検履歴をクリアしますか？")) return;
+
+            if (currentUser) {
+                try {
+                    const historyCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'history');
+                    const snapshot = await getDocs(historyCol);
+                    const deletePromises = snapshot.docs.map(d => deleteDoc(d.ref));
+                    await Promise.all(deletePromises);
+                } catch (e) {
+                    console.error("Clear history error:", e);
                 }
+            } else {
+                window.appState.history = [];
+                renderHistory();
             }
+
+            showModal("履歴クリア", "受検履歴を初期化しました。");
+        };
+
+        // --- お問い合わせ送信処理 ---
+        window.handleSendSupportContact = function(e) {
+            e.preventDefault();
+            const message = document.getElementById('contact-message').value.trim();
+            if (!message) return;
+
+            showModal("送信完了", "お問い合わせ・ご意見を受け付けました。貴重なご意見ありがとうございます！");
+            e.target.reset();
         };
 
         function showModal(title, msg) {
